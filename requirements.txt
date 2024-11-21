@@ -1,0 +1,10 @@
+aiortc
+numpy<2.0
+opencv-python-headless
+ultralytics
+streamlit
+streamlit-webrtc
+torch==2.5.1+cu124
+torchaudio==2.5.1+cu124
+torchvision==0.20.1+cu124
+fastapi

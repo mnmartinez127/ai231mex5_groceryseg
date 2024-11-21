@@ -1,0 +1,16 @@
+[server]
+headless = true
+port = 8651
+enableCORS = true
+enableXsrfProtection = true
+enableWebsocketCompression = true
+sslKeyFile = "./.streamlit/key.pem"
+sslCertFile = "./.streamlit/cert.pem"
+folderWatchBlacklist = ["./data","./dataset","./models"]
+
+[logger]
+level = "debug"
+
+[browser]
+gatherUsageStats = false
+serverPort = 8651
