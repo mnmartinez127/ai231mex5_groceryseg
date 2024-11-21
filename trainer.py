@@ -24,7 +24,7 @@ annotation_dirs = []
 train_annotation_dirs = []
 val_annotation_dirs = []
 
-root_dir = os.path.join(os.getcwd(),"..")
+root_dir = os.path.join(os.getcwd())#,"..")
 data_root_dir = os.path.join("data","detection","grocery")
 data_root_dir = os.path.join(root_dir,data_root_dir)
 #Master dataset
