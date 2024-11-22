@@ -290,10 +290,10 @@ else:
     devices = "cpu"
 
 models = {
-    #"YOLOv11 Segmentation N": "yolo11n-seg.pt",
+    "YOLOv11 Segmentation N": "yolo11n-seg.pt",
     "YOLOv11 Segmentation S": "yolo11s-seg.pt",
     "YOLOv11 Segmentation M": "yolo11m-seg.pt",
-    "YOLOv11 Segmentation L": "yolo11l-seg.pt",
+    #"YOLOv11 Segmentation L": "yolo11l-seg.pt",
 }
 
 
@@ -305,13 +305,13 @@ for k,v in models.items():
     try:
         #reload last checkpoint if exists
         if os.path.isfile(os.path.join(model_dir,k,"weights","last.pt")):
-            model = YOLO(os.path.join(model_dir,k,"weights","last.pt"))
+            model = YOLO(os.path.join(model_dir,k,"weights","last.pt"),task="segment")
             trained_model = model.train(resume=True)
         else:
-            model = YOLO(v)
+            model = YOLO(v,task="segment")
             trained_model = model.train(
             data=yaml_dir,
-            epochs=200,
+            epochs=500,
             imgsz=640,
             batch=16,
             patience=20,

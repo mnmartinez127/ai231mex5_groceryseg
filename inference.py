@@ -10,11 +10,18 @@ from ultralytics import YOLO
 import numpy as np
 import torch
 
-SERVER_ADDRESS = "http://202.92.159.241:8086/infer_frame"
-#SERVER_ADDRESS = "http://127.0.0.1:8086/infer_frame"
+
+#SERVER_ADDRESS = "http://202.92.159.241:8002/infer_frame"
+SERVER_ADDRESS = "http://202.92.159.241:8003/infer_frame"
+#SERVER_ADDRESS = "http://202.92.159.241:8002/infer_frame"
+#SERVER_ADDRESS = "http://127.0.0.1:8003/infer_frame"
+
+
 RTC_CONFIG =  [{"urls": ["stun:stun.l.google.com:19302"]}]
 MAX_FRAME_RATE = 60
-
+model_mode="torch"
+model_device_LIST = list(range(torch.cuda.device_count()))
+model_device=0 if torch.cuda.is_available() else "cpu"
 #Model data
 root_dir = os.path.join(os.getcwd())#,"..")
 models_dir = os.path.join(root_dir, "models")
@@ -51,6 +58,28 @@ model_select = st.sidebar.radio("Select Model", sorted(list(model_dict.keys())))
 
 
 
+def load_model(model_path,mode="torch"):
+    torch.cuda.empty_cache()
+    model = YOLO(model_path,task="segment")
+    match mode:
+        case "onnx":
+            if os.path.exists(os.path.splitext(model_path)[0]+".onnx"):
+                model = YOLO(os.path.splitext(model_path)[0]+".onnx",task="segment")
+            else:
+                new_model_path = model.export(format="onnx",device=model_device)
+                model = YOLO(new_model_path,task="segment")
+        case "tensorrt":
+            if os.path.exists(os.path.splitext(model_path)[0]+".engine"):
+                model = YOLO(os.path.splitext(model_path)[0]+".engine",task="segment")
+            else:
+                new_model_path = model.export(format="engine",device=model_device)
+                model = YOLO(new_model_path,task="segment",task="segment")
+        case _:
+            pass
+    categories = [] if model.names is None else sorted(model.names.items(), key = lambda x:x[0])
+    return model,categories
+
+
 class Model:
     model:YOLO|None
     params:dict
@@ -62,19 +91,21 @@ class Model:
         self.update_params(params)
 
     def update_params(self,params):
+        print(params)
         if params.get("model_name","") != self.params.get("model_name",""):
-            torch.cuda.empty_cache()
-            if params.get("model_name","").lower().startswith("yolo"):
-                try:
-                    self.model = YOLO(model_dict.get(params.get("model_name",""),"yolo11n-seg.pt"),task="segment")
-                    self.categories = [] if self.model.names is None else sorted(self.model.names.items(), key = lambda x:x[0])
-                except Exception:
-                    pass
+            try:
+                model,categories = load_model(model_dict[params.get("model_name","")],mode=params.get("mode","torch"))
+                if model is not None:
+                    self.model = model
+                    self.categories = categories
+                    torch.cuda.empty_cache()
+            except Exception:
+                pass
         self.params.update(params)
 
     def infer(self,image,params:dict={},address:str=""):
         if address: #server-side processing
-            print("Performing server-side inference!")
+            print(f"Performing server-side inference! Server is {address}")
             err, encoded_image = cv2.imencode('.jpg', image)
             sent_params = {}
             sent_params.update(self.params)
@@ -90,7 +121,8 @@ class Model:
             results = self.model.track(image,
                                         conf = self.params.get("conf_threshold",0.0),
                                         iou = self.params.get("iou_threshold",0.0),
-                                        classes = self.params.get("classes",None)
+                                        classes = self.params.get("classes",None),
+                                        device = self.params.get("device","cpu"),
                                         )
             result_frame =  results[0].plot(boxes = self.params.get("show_boxes",True),
                                                 masks = self.params.get("show_masks",True)
@@ -121,6 +153,8 @@ new_params = {
     "classes": [i[0] for i in selected_classes] if selected_classes else None,
     "show_boxes": show_boxes,
     "show_masks": show_masks,
+    "mode": model_mode,
+    "device": model_device,
 }
 
 address = SERVER_ADDRESS if mode_select == "Server" else ""
