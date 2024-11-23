@@ -14,7 +14,11 @@ except ImportError:
     os.system("pip install 'numpy<2.0'")
     os.system("pip install ultralytics")
     os.system("pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121")
-
+    import cv2
+    import torch
+    import numpy as np
+    from ultralytics import YOLO, SAM
+    from ultralytics.data.converter import convert_coco
 #Training data folders
 data_dirs = []
 train_dirs = []

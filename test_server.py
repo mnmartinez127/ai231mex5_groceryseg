@@ -17,7 +17,12 @@ except ImportError:
     #Best to install these manually
     #os.system("pip install onnx onnxslim onnxruntime-gpu")
     #os.system("pip install tensorrt")
-
+    import cv2
+    import torch
+    import numpy as np
+    from ultralytics import YOLO
+    from fastapi import FastAPI, File, UploadFile
+    from starlette.responses import StreamingResponse
 
 #Define initial constants, should not change!
 SERVER_ADDRESS = "http://202.92.159.241"   #DGX server 1

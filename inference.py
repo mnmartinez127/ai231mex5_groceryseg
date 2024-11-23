@@ -22,7 +22,14 @@ except ImportError:
     #Best to install these manually
     #os.system("pip install onnx onnxslim onnxruntime-gpu")
     #os.system("pip install tensorrt")
-
+    import cv2
+    import torch
+    import numpy as np
+    from ultralytics import YOLO
+    import av
+    import streamlit as st
+    from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration, VideoProcessorBase
+    from twilio.rest import Client
 
 #Define initial constants, should not change!
 SERVER_ADDRESS = "http://202.92.159.241"   #DGX server 1
@@ -78,7 +85,7 @@ MODEL_LIST = sorted(list(model_dict.keys()))
 
 #Initialize session parameters
 params = {
-    "model_name":"No Model",
+    "model_name":"No Model" if len(MODEL_LIST)==0 else MODEL_LIST[0],
     "model_device":0 if torch.cuda.is_available() else "cpu",
     "model_mode":"torch",
     "server_url":SERVER_URL,
@@ -142,14 +149,14 @@ class Model:
                                 model = YOLO(model_path,task="segment")
                     classes = [] if model.names is None else sorted(model.names.items(), key = lambda x:x[0])
             except Exception:
-                pass
+                self.params.update(params)
             else:
                 self.model = model
+                self.params.update(params)
                 self.params["classes"] = classes
             finally:
                 torch.cuda.empty_cache()
         #update parameters
-        self.params.update(params)
 
     def infer_image(self,image,params):
         if params.get("server_url",self.params["server_url"]): #server-side processing
@@ -206,18 +213,17 @@ st.sidebar.header("Advanced Options")
 #Select the input source
 source_select = st.sidebar.radio("Input Source", ["Webcam", "Webcamv2", "Image"])
 server_select = st.sidebar.radio("Infer Source", ["Server","Client"])
-rtc_select = st.sidebar.radio("Camera Server", ["REST", "TURN"])
 
 server_lists = get_server_lists(server_lists)
 if server_select == "Server":
-    device_select = st.sidebar.radio("Device Used", server_lists["devices"]+["cpu"])
-    mode_select = st.sidebar.radio("Model Mode",server_lists["modes"])
     model_select = st.sidebar.radio("Select Model", server_lists["models"]+["No Model"])
+    mode_select = st.sidebar.radio("Model Mode",server_lists["modes"])
+    device_select = st.sidebar.radio("Device Used", server_lists["devices"]+["cpu"])
 else: #"Client" option
-    device_select = st.sidebar.radio("Device Used", DEVICE_LIST+["cpu"])
-    mode_select = st.sidebar.radio("Model Mode",MODE_LIST)
     model_select = st.sidebar.radio("Select Model", MODEL_LIST+["No Model"])
-
+    mode_select = st.sidebar.radio("Model Mode",MODE_LIST)
+    device_select = st.sidebar.radio("Device Used", DEVICE_LIST+["cpu"])
+rtc_select = st.sidebar.radio("Camera Server", ["REST", "TURN"])
 
 #Use a 2-row display instead of a sidebar
 display_columns = st.columns(2)
@@ -230,7 +236,7 @@ with display_columns[0]:
     show_boxes = st.checkbox("Show Boxes", value = True)
     show_masks = st.checkbox("Show Masks", value = True)
 
-#get UI parameters
+#get UI parameters - Part 2
 new_params = {
     "model_name": model_select,
     "model_device": device_select,
