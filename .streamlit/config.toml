@@ -1,6 +1,6 @@
 [server]
 headless = true
-port = 8651
+port = 8006
 enableCORS = true
 enableXsrfProtection = true
 enableWebsocketCompression = true
@@ -13,4 +13,4 @@ level = "debug"
 
 [browser]
 gatherUsageStats = false
-serverPort = 8651
+serverPort = 8006

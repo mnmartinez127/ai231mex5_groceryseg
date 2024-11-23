@@ -24,7 +24,7 @@ annotation_dirs = []
 train_annotation_dirs = []
 val_annotation_dirs = []
 
-root_dir = os.path.join(os.getcwd())#,"..")
+root_dir = os.path.join(os.getcwd())
 data_root_dir = os.path.join("data","detection","grocery")
 data_root_dir = os.path.join(root_dir,data_root_dir)
 #Master dataset
@@ -73,7 +73,8 @@ new_train_annotation_dir = os.path.join(new_annotation_dir,"instances_train.json
 new_val_annotation_dir = os.path.join(new_annotation_dir,"instances_val.json")
 
 label_dir = os.path.join(new_data_dir,"labels")
-model_dir = os.path.join(root_dir,"models")
+model_dir = os.path.join(new_data_dir,"models")
+#model_dir = os.path.join(root_dir,"models")
 yaml_dir = os.path.join(root_dir,"grocery.yaml")
 
 
@@ -301,7 +302,7 @@ models = {
 
 for k,v in models.items():
     print(f"{k}: {os.path.join(model_dir,v)}")
-
+    
     try:
         #reload last checkpoint if exists
         if os.path.isfile(os.path.join(model_dir,k,"weights","last.pt")):
@@ -323,8 +324,9 @@ for k,v in models.items():
             val=True,
             plots=True,
             dropout=0.05,
-            save=True,
-            save_period=1,
+            #Uncomment the below settings to save each iteration. This will take up more disk space, so beware!
+            #save=True,
+            #save_period=1,
             cache=True,
             project=model_dir,
             name=k,
@@ -333,3 +335,9 @@ for k,v in models.items():
     except Exception:
         print(f"{k} failed to train!")
         continue
+    
+    #Validate the best and last models
+    model = YOLO(os.path.join(model_dir,k,"weights","last.pt"),task="segment")
+    model.val(save_json=True,plots=True,save_hybrid=True,devices=devices,project=model_dir,name=k+"-last")
+    model = YOLO(os.path.join(model_dir,k,"weights","best.pt"),task="segment")
+    model.val(save_json=True,plots=True,save_hybrid=True,devices=devices,project=model_dir,name=k+"-best")

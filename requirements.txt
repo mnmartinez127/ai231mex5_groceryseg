@@ -10,5 +10,5 @@ torchvision==0.20.1+cu124
 fastapi
 onnx
 onnxslim
-onnxruntiime-seg
+onnxruntime-gpu
 tensorrt
