@@ -11,12 +11,14 @@ try:
     import av
     import streamlit as st
     from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration, VideoProcessorBase
+    from twilio.rest import Client
 except ImportError:
     os.system("pip install opencv-python opencv-python-contrib")
     os.system("pip install 'numpy<2.0'")
     os.system("pip install ultralytics")
     os.system("pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121")
     os.system("pip install streamlit streamlit-webrtc")
+    os.system("pip install twilio")
     #Best to install these manually
     #os.system("pip install onnx onnxslim onnxruntime-gpu")
     #os.system("pip install tensorrt")
@@ -41,7 +43,26 @@ INFER_PAGE = "/infer_frame"
 SERVER_URL = f"{SERVER_ADDRESS}:{PORT_NUMBER}{INFER_PAGE}"
 LIST_SERVER_URL = f"{SERVER_ADDRESS}:{PORT_NUMBER}{LIST_PAGE}"
 
+
+#get twilio TURN server if credentials are available
+def get_ice_servers():
+    try:
+        if os.path.isfile("twilio_keys.twilio"):
+            with open("twilio_keys.twilio","r",encoding="utf-8") as keyfile:
+                account_sid,auth_token = keyfile.readline().split(" ")
+                client = Client(account_sid, auth_token)
+                token = client.tokens.create()
+                return token.ice_servers
+        else:
+            raise Exception
+    except Exception as e:
+        print("Failed to load twilio server! {e}")
+        return [{"urls": ["stun:stun.l.google.com:19302"]}]
+
+
+
 RTC_CONFIG =  [{"urls": ["stun:stun.l.google.com:19302"]}]
+RTC_TURN_CONFIG = get_ice_servers()
 MAX_FRAME_RATE = 60
 DEVICE_LIST = list(range(torch.cuda.device_count()))
 MODE_LIST = ["torch","onnx"]
@@ -184,8 +205,8 @@ st.title("Machine Exercise 5")
 st.sidebar.header("Advanced Options")
 #Select the input source
 source_select = st.sidebar.radio("Input Source", ["Webcam", "Webcamv2", "Image"])
-
 server_select = st.sidebar.radio("Infer Source", ["Server","Client"])
+rtc_select = st.sidebar.radio("Camera Server", ["REST", "TURN"])
 
 server_lists = get_server_lists(server_lists)
 if server_select == "Server":
@@ -223,6 +244,8 @@ new_params = {
 }
 #Update session parameters
 params.update(new_params)
+
+rtc_configuration = RTC_TURN_CONFIG if rtc_select == "TURN" else RTC_CONFIG
 
 #Inference Window
 with display_columns[1]:
@@ -264,7 +287,7 @@ with display_columns[1]:
             infer_stream = webrtc_streamer(
                 key = "Inference Result", 
                 mode = WebRtcMode.SENDRECV, 
-                rtc_configuration = RTC_CONFIG, 
+                rtc_configuration = rtc_configuration, 
                 video_processor_factory = InferenceProcessor, 
                 media_stream_constraints = {"video": True, "audio": False}, 
                 async_processing = True, 
@@ -296,7 +319,7 @@ with display_columns[1]:
             infer_stream = webrtc_streamer(
                 key = "Inference Result", 
                 mode = WebRtcMode.SENDONLY, 
-                rtc_configuration = RTC_CONFIG, 
+                rtc_configuration = rtc_configuration, 
                 media_stream_constraints = {"video": True, "audio":False}, 
             )
 

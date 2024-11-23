@@ -32,9 +32,9 @@ to open the application user interface.
 
 The application can be used on its own. However, it can also be used as a client to the included server script. To run the server, open a terminal inside the repository folder, then run:
 ```
-python server.py [PORT]
+python server.py -p [PORT]
 ```
-This will run the server component on a specified port Ex: `python server.py 8000` will run the server on port 8000 of your device. Not specifying a port will result in port 8002 being used.
+This will run the server component on a specified port Ex: `python server.py -p 8000` will run the server on port 8000 of your device. `-p [PORT]` is optional and will default to port 8002 being used.
 If you are using ssh on a server, you can use:
 ```
 nohup sh -c 'python server.py' > server_out.txt 2>&1 &
@@ -50,7 +50,7 @@ The model used in this application is a YOLO11 segmentation model fine-tuned on 
 Training was performed over 500 epochs using the **yolo11m-seg** model from Ultralytics as a base. Two more models were also trained under the same settings using the **yolo11s-seg** and **yolo11n-seg** models as a base, presented in decreasing order of size.
 The patch sub-directories, **12_nestle_all_purpose_cream** and **ketchup**, are needed to complete the dataset, however the training script will still run if either of these are missing. However, the **dataset** folder is required.
 The dataset layout, with patches, is as follows:
-
+```
 data/detection/
 └───grocery
     ├───12_nestle_all_purpose_cream
@@ -86,7 +86,7 @@ data/detection/
         └───labels
                 ├───train_ketchup_annotations.json
                 └───val_ketchup_annotations.json
-
+```
 
 ### Training on dataset
 Make sure that your dataset is in the correct format as listed above.
