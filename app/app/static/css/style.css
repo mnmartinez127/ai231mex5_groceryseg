@@ -1,0 +1,96 @@
+
+.image {
+  width: 200px;
+  height: 200px;
+  cursor: pointer;
+  border: 2px solid #ccc;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+
+table {
+  flex: 1;
+  width: 100%;
+  margin-top: 20px;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: center;
+}
+
+#video,
+#canvas,
+#processed-image {
+  width: 480px;
+  height: 360px;
+}
+
+
+#image-filters,
+#detection-settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 300px;
+  margin-top: 10px;
+}
+
+#image-filters div,
+#detection-settings div {
+  margin-bottom: 10px;
+}
+
+#image-filters label,
+#detection-settings label {
+  font-size: 12px;
+  text-align: center;
+  width: 60px;
+  font-weight: bold;
+}
+
+#image-filters input,
+#detection-settings input {
+  width: 100%;
+  appearance: none;
+  background-color: #e0e0e0;
+  height: 5px;
+  border-radius: 5px;
+  outline: none;
+}
+
+#image-filters input::-webkit-slider-thumb,
+#detection-settings input::-webkit-slider-thumb {
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  background-color: #3498db;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+#reset-filters {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#reset-filters:hover {
+  background-color: #267bb5;
+}
+
+#inference-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin-top: 20px;
+}

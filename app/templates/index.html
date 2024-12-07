@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Machine Exercise 6 Display</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+</head>
+
+<body>
+  <div class="container" style="display: flex;">
+    <h1 class="header-title" style="display: center">MEX6-Martinez</h1>
+    <form id="form-connect">
+      <div class="input-group mb-3">
+        <select id="camera-select"></select>
+        <button class="btn btn-success" type="submit" id="button-start">Start</button>
+      </div>
+    </form>
+    <table>
+      <tr>
+        <td>
+          Input Image
+        </td>
+        <td>
+          Output Image
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <video id="video"></video>
+        </td>
+        <td>
+          <canvas id="canvas" hidden></canvas>
+          <img id="processed-image"></img>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p id="fps">FPS: ??</p>
+        </td>
+        <td>
+          <p id="latency">Latency: ??ms</p>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+
+  <div id="options-and-filters" style="margin-top: 20px;">
+    <div id="detection-settings" style="margin-top: 20px;">
+      <div style="font-weight: bold;">Detection Settings:</div>
+      <div style="display: flex; justify-content: space-between;">
+        <div style="width: 48%;">
+          <label for="conf">Confidence Threshold:</label>
+          <input type="range" id="conf" name="conf" min="0" max="1" value="0.5" step="0.01">
+        </div>
+        <div style="width: 48%;">
+          <label for="iou">IoU Threshold:</label>
+          <input type="range" id="iou" name="iou" min="0" max="1" value="0.5" step="0.01">
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <div style="width: 31%;">
+          <label for="zoom-scale">Zoom Scale:</label>
+          <input type="range" id="zoom-scale" name="zoom-scale" min="1.0" max="5.0" value="1.0" step="0.5">
+        </div>
+        <div style="width: 31%;">
+          <label for="cx">Horizontal Offset:</label>
+          <input type="range" id="cx" name="cx" min="0" max="1" value="0.5" step="0.01">
+        </div>
+        <div style="width: 31%;">
+          <label for="cy">Vertical Offset:</label>
+          <input type="range" id="cy" name="cy" min="0" max="1" value="0.5" step="0.01">
+        </div>
+      </div>
+    </div>
+
+    <div id="display-settings" style="margin-top: 20px;">
+      <div style="font-weight: bold;">Display Settings:</div>
+      <div style="display: flex; justify-content: space-between;">
+        <div id="show-form">
+          <div style="width: 31%;">
+            <label>
+              <input type="checkbox" name="show-boxes" value="boxes" checked> Show Boxes
+            </label>
+          </div>
+          <div style="width: 31%;">
+            <label>
+              <input type="checkbox" name="show-masks" value="masks" checked> Show Masks
+            </label>
+          </div>
+          <div style="width: 31%;">
+            <label>
+              <input type="checkbox" name="rescale" value="rescale" checked> Enable Focus
+            </label>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <div id="zoom-form">
+          <div>
+            <label>
+              <input type="radio" name="zoom-mode" value="disable" checked> Disable
+            </label>
+          </div>
+          <div>
+            <label>
+              <input type="radio" name="zoom-mode" value="center"> Center
+            </label>
+          </div>
+          <div>
+            <label>
+              <input type="radio" name="zoom-mode" value="grid"> Grid
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+      
+    <div id="image-filters" style="margin-top: 20px;">
+      <div style="font-weight: bold;">Image filters:</div>
+      <div style="display: flex; justify-content: space-between;">
+        <div style="width: 48%;">
+          <label for="brightness">Brightness:</label>
+          <input type="range" id="brightness" name="brightness" min="0" max="200" value="100">
+        </div>
+        <div style="width: 48%;">
+          <label for="contrast">Contrast:</label>
+          <input type="range" id="contrast" name="contrast" min="0" max="200" value="100">
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <div style="width: 41%;">
+          <label for="grayscale">Grayscale:</label>
+          <input type="range" id="grayscale" name="grayscale" min="0" max="100" value="0">
+        </div>
+        <div style="width: 41%;">
+            <label for="saturate">Saturate:</label>
+            <input type="range" id="saturate" name="saturate" min="0" max="200" value="100">
+          </div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between;">
+        <div style="width: 12%;">
+          <button id="reset-filters" onclick="resetFilters()" style="margin-top: 10px;">Reset to Default</button>
+        </div>
+      </div>
+  </div>
+
+  <script src="{{ url_for('static', path='js/script.js') }}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,22 @@
+=== Validation Log ===
+Dataset directory: /Users/geyzsonkristoffer/Documents/github/AI231/MEX6/dataset/dataset_v3
+
+Validating training data...
+[train] All images in /Users/geyzsonkristoffer/Documents/github/AI231/MEX6/dataset/dataset_v3/images/train are in the annotations.
+[train] All annotated images are present in /Users/geyzsonkristoffer/Documents/github/AI231/MEX6/dataset/dataset_v3/images/train.
+No duplicate train image IDs found.
+No duplicate train category IDs found.
+No duplicate train annotation IDs found.
+[train] All annotation image IDs match images in train.
+[train] All categories in annotations exist in categories list.
+[train] Validation complete.
+
+Validating validation data...
+[val] All images in /Users/geyzsonkristoffer/Documents/github/AI231/MEX6/dataset/dataset_v3/images/val are in the annotations.
+[val] All annotated images are present in /Users/geyzsonkristoffer/Documents/github/AI231/MEX6/dataset/dataset_v3/images/val.
+No duplicate val image IDs found.
+No duplicate val category IDs found.
+No duplicate val annotation IDs found.
+[val] All annotation image IDs match images in val.
+[val] All categories in annotations exist in categories list.
+[val] Validation complete.
